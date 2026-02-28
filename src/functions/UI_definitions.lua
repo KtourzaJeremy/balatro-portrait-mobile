@@ -3572,63 +3572,63 @@ function G.UIDEF.view_deck(unplayed_only)
     }}
     return t
   else
-  local t = 
-  {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
-    {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={}},
-    {n=G.UIT.R, config={align = "cm"}, nodes={
-      {n=G.UIT.C, config={align = "cm", minw = 1.5, minh = 2, r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes={
-        {n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes={
-          {n=G.UIT.R, config={align = "cm", r = 0.1, colour = G.C.L_BLACK, emboss = 0.05, padding = 0.15}, nodes={
-            {n=G.UIT.R, config={align = "cm"}, nodes={
-              {n=G.UIT.O, config={object = DynaText({string = G.GAME.selected_back.loc_name, colours = {G.C.WHITE}, bump = true, rotate = true, shadow = true, scale = 0.6 - string.len(G.GAME.selected_back.loc_name)*0.01})}},
+    local t = 
+    {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
+      {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={}},
+      {n=G.UIT.R, config={align = "cm"}, nodes={
+        {n=G.UIT.C, config={align = "cm", minw = 1.5, minh = 2, r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes={
+          {n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes={
+            {n=G.UIT.R, config={align = "cm", r = 0.1, colour = G.C.L_BLACK, emboss = 0.05, padding = 0.15}, nodes={
+              {n=G.UIT.R, config={align = "cm"}, nodes={
+                {n=G.UIT.O, config={object = DynaText({string = G.GAME.selected_back.loc_name, colours = {G.C.WHITE}, bump = true, rotate = true, shadow = true, scale = 0.6 - string.len(G.GAME.selected_back.loc_name)*0.01})}},
+              }},
+              {n=G.UIT.R, config={align = "cm", r = 0.1, padding = 0.1, minw = 2.5, minh = 1.3, colour = G.C.WHITE, emboss = 0.05}, nodes={
+                {n=G.UIT.O, config={object = UIBox{
+                  definition = G.GAME.selected_back:generate_UI(nil,0.7, 0.5, G.GAME.challenge),
+                  config = {offset = {x=0,y=0}}
+                }}}
+              }}
             }},
-            {n=G.UIT.R, config={align = "cm", r = 0.1, padding = 0.1, minw = 2.5, minh = 1.3, colour = G.C.WHITE, emboss = 0.05}, nodes={
-              {n=G.UIT.O, config={object = UIBox{
-                definition = G.GAME.selected_back:generate_UI(nil,0.7, 0.5, G.GAME.challenge),
-                config = {offset = {x=0,y=0}}
-              }}}
+            {n=G.UIT.R, config={align = "cm", r = 0.1, outline_colour = G.C.L_BLACK, line_emboss = 0.05, outline = 1.5}, nodes={
+              {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.07}, nodes={
+                  {n=G.UIT.O, config={object = DynaText({string = {{string = localize('k_base_cards'), colour = G.C.RED}, modded and {string = localize('k_effective'), colour = G.C.BLUE} or nil}, colours = {G.C.RED}, silent = true,scale = 0.4,pop_in_rate = 10, pop_delay = 4})}}
+              }},
+              {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
+                tally_sprite({x=1,y=0},{{string = ''..ace_tally, colour = flip_col},{string =''..mod_ace_tally, colour = G.C.BLUE}}, {localize('k_aces')}),--Aces
+                tally_sprite({x=2,y=0},{{string = ''..face_tally, colour = flip_col},{string =''..mod_face_tally, colour = G.C.BLUE}}, {localize('k_face_cards')}),--Face
+                tally_sprite({x=3,y=0},{{string = ''..num_tally, colour = flip_col},{string =''..mod_num_tally, colour = G.C.BLUE}}, {localize('k_numbered_cards')}),--Numbers
+              }},
+              {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
+                tally_sprite({x=3,y=1}, {{string = ''..suit_tallies['Spades'], colour = flip_col},{string =''..mod_suit_tallies['Spades'], colour = G.C.BLUE}}, {localize('Spades', 'suits_plural')}),
+                tally_sprite({x=0,y=1}, {{string = ''..suit_tallies['Hearts'], colour = flip_col},{string =''..mod_suit_tallies['Hearts'], colour = G.C.BLUE}}, {localize('Hearts', 'suits_plural')}),
+              }},
+              {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
+                tally_sprite({x=2,y=1}, {{string = ''..suit_tallies['Clubs'], colour = flip_col},{string =''..mod_suit_tallies['Clubs'], colour = G.C.BLUE}}, {localize('Clubs', 'suits_plural')}),
+                tally_sprite({x=1,y=1}, {{string = ''..suit_tallies['Diamonds'], colour = flip_col},{string =''..mod_suit_tallies['Diamonds'], colour = G.C.BLUE}}, {localize('Diamonds', 'suits_plural')}),
+              }},
             }}
           }},
-          {n=G.UIT.R, config={align = "cm", r = 0.1, outline_colour = G.C.L_BLACK, line_emboss = 0.05, outline = 1.5}, nodes={
-            {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.07}, nodes={
-                {n=G.UIT.O, config={object = DynaText({string = {{string = localize('k_base_cards'), colour = G.C.RED}, modded and {string = localize('k_effective'), colour = G.C.BLUE} or nil}, colours = {G.C.RED}, silent = true,scale = 0.4,pop_in_rate = 10, pop_delay = 4})}}
-            }},
-            {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
-              tally_sprite({x=1,y=0},{{string = ''..ace_tally, colour = flip_col},{string =''..mod_ace_tally, colour = G.C.BLUE}}, {localize('k_aces')}),--Aces
-              tally_sprite({x=2,y=0},{{string = ''..face_tally, colour = flip_col},{string =''..mod_face_tally, colour = G.C.BLUE}}, {localize('k_face_cards')}),--Face
-              tally_sprite({x=3,y=0},{{string = ''..num_tally, colour = flip_col},{string =''..mod_num_tally, colour = G.C.BLUE}}, {localize('k_numbered_cards')}),--Numbers
-            }},
-            {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
-              tally_sprite({x=3,y=1}, {{string = ''..suit_tallies['Spades'], colour = flip_col},{string =''..mod_suit_tallies['Spades'], colour = G.C.BLUE}}, {localize('Spades', 'suits_plural')}),
-              tally_sprite({x=0,y=1}, {{string = ''..suit_tallies['Hearts'], colour = flip_col},{string =''..mod_suit_tallies['Hearts'], colour = G.C.BLUE}}, {localize('Hearts', 'suits_plural')}),
-            }},
-            {n=G.UIT.R, config={align = "cm", minh = 0.05, padding = 0.1}, nodes={
-              tally_sprite({x=2,y=1}, {{string = ''..suit_tallies['Clubs'], colour = flip_col},{string =''..mod_suit_tallies['Clubs'], colour = G.C.BLUE}}, {localize('Clubs', 'suits_plural')}),
-              tally_sprite({x=1,y=1}, {{string = ''..suit_tallies['Diamonds'], colour = flip_col},{string =''..mod_suit_tallies['Diamonds'], colour = G.C.BLUE}}, {localize('Diamonds', 'suits_plural')}),
-            }},
-          }}
+          {n=G.UIT.C, config={align = "cm"}, nodes=rank_cols},
+          {n=G.UIT.B, config={w = 0.1, h = 0.1}},
         }},
-        {n=G.UIT.C, config={align = "cm"}, nodes=rank_cols},
-        {n=G.UIT.B, config={w = 0.1, h = 0.1}},
+        {n=G.UIT.B, config={w = 0.2, h = 0.1}},
+        {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes=deck_tables}
       }},
-      {n=G.UIT.B, config={w = 0.2, h = 0.1}},
-      {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes=deck_tables}
-    }},
-    {n=G.UIT.R, config={align = "cm", minh = 0.8, padding = 0.05}, nodes={
-      modded and {n=G.UIT.R, config={align = "cm"}, nodes={
-        {n=G.UIT.C, config={padding = 0.3, r = 0.1, colour = mix_colours(G.C.BLUE, G.C.WHITE,0.7)}, nodes = {}},
-        {n=G.UIT.T, config={text =' '..localize('ph_deck_preview_effective'),colour = G.C.WHITE, scale =0.3}},
-      }} or nil,
-      wheel_flipped > 0 and {n=G.UIT.R, config={align = "cm"}, nodes={
-        {n=G.UIT.C, config={padding = 0.3, r = 0.1, colour = flip_col}, nodes = {}},
-        {n=G.UIT.T, config={text =' '..(wheel_flipped > 1 and
-          localize{type = 'variable', key = 'deck_preview_wheel_plural', vars = {wheel_flipped}} or
-          localize{type = 'variable', key = 'deck_preview_wheel_singular', vars = {wheel_flipped}}),colour = G.C.WHITE, scale =0.3}},
-      }} or nil,
+      {n=G.UIT.R, config={align = "cm", minh = 0.8, padding = 0.05}, nodes={
+        modded and {n=G.UIT.R, config={align = "cm"}, nodes={
+          {n=G.UIT.C, config={padding = 0.3, r = 0.1, colour = mix_colours(G.C.BLUE, G.C.WHITE,0.7)}, nodes = {}},
+          {n=G.UIT.T, config={text =' '..localize('ph_deck_preview_effective'),colour = G.C.WHITE, scale =0.3}},
+        }} or nil,
+        wheel_flipped > 0 and {n=G.UIT.R, config={align = "cm"}, nodes={
+          {n=G.UIT.C, config={padding = 0.3, r = 0.1, colour = flip_col}, nodes = {}},
+          {n=G.UIT.T, config={text =' '..(wheel_flipped > 1 and
+            localize{type = 'variable', key = 'deck_preview_wheel_plural', vars = {wheel_flipped}} or
+            localize{type = 'variable', key = 'deck_preview_wheel_singular', vars = {wheel_flipped}}),colour = G.C.WHITE, scale =0.3}},
+        }} or nil,
+      }}
     }}
-  }}
-  return t
-end
+    return t
+  end
 end
 
 function tally_sprite(pos, value, tooltip)
@@ -6439,65 +6439,76 @@ function create_UIBox_main_menu_buttons()
 
   local quit_func = 'quit'
 
-  local t = {
-    n=G.UIT.ROOT, config = {align = "cm",colour = G.C.CLEAR}, nodes={ 
-      {n=G.UIT.C, config={align = "bm"}, nodes={      
-        {n=G.UIT.R, config={align = "cm", padding = 0.2, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK, mid = true}, nodes={
-          UIBox_button{id = 'main_menu_play', button = not G.SETTINGS.tutorial_complete and "start_run" or "setup_run", colour = G.C.BLUE, minw = 3.65, minh = 1.55, label = {localize('b_play_cap')}, scale = text_scale*2, col = true},
-          {n=G.UIT.C, config={align = "cm"}, nodes={
-            UIBox_button{button = 'options', colour = G.C.ORANGE, minw = 2.65, minh = 1.35, label = {localize('b_options_cap')}, scale = text_scale * 1.2, col = true},
-            G.F_QUIT_BUTTON and {n=G.UIT.C, config={align = "cm", minw = 0.2}, nodes={}} or nil,
-            G.F_QUIT_BUTTON and UIBox_button{button = quit_func, colour = G.C.RED, minw = 2.65, minh = 1.35, label = {localize('b_quit_cap')}, scale = text_scale * 1.2, col = true} or nil,
-          }},
-          UIBox_button{id = 'collection_button', button = "your_collection", colour = G.C.PALE_GREEN, minw = 3.65, minh = 1.55, label = {localize('b_collection_cap')}, scale = text_scale*1.5, col = true},
-        }},
-      }},
-      {n=G.UIT.C, config={align = "br", minw = 3.2, padding = 0.1}, nodes={
-        G.F_DISCORD and {n=G.UIT.R, config = {align = "cm", padding = 0.2}, nodes={
-          {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, hover = true, colour = mix_colours(G.C.BLUE, G.C.GREY, 0.4), button = 'go_to_discord', shadow = true}, nodes={
-            {n=G.UIT.O, config={object = discord}},
-          }},
-          {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, hover = true, colour = G.C.BLACK, button = 'go_to_twitter', shadow = true}, nodes={
-            {n=G.UIT.O, config={object = twitter}},
-          }}
-        }} or nil,
-        not G.F_ENGLISH_ONLY and {n=G.UIT.R, config = {align = "cm", padding = 0.2, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK}, nodes={
-          {n=G.UIT.R, config={align = "cm", padding = 0.15, minw = 1, r = 0.1, hover = true, colour = mix_colours(G.C.WHITE, G.C.GREY, 0.2), button = 'language_selection', shadow = true}, nodes={
-            {n=G.UIT.O, config={object = language}},
-            {n=G.UIT.T, config={text = G.LANG.label, scale = 0.4, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
-          }}
-        }} or nil,
-      }},
-    }}
   -- PORTRAIT MODE: Vertical button layout
   if G.F_PORTRAIT then
     local t = {
-      n=G.UIT.ROOT, config = {align = "bm", colour = G.C.CLEAR}, nodes={ 
-        {n=G.UIT.C, config={align = "cm"}, nodes={      
-          {n=G.UIT.R, config={align = "cm", padding = 0.1, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK}, nodes={
-            -- Row 1: Profile + Play
-            {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-              not G.F_ENGLISH_ONLY and {n=G.UIT.C, config={align = "cm", padding = 0.1, minw = 0.8, r = 0.1, hover = true, colour = mix_colours(G.C.WHITE, G.C.GREY, 0.2), button = 'language_selection', shadow = true}, nodes={
-                {n=G.UIT.O, config={object = language}},
-              }} or nil,
-              UIBox_button{id = 'main_menu_play', button = not G.SETTINGS.tutorial_complete and "start_run" or "setup_run", colour = G.C.BLUE, minw = 2, minh = 1, label = {localize('b_play_cap')}, scale = text_scale*1.5, col = true},
+      n=G.UIT.ROOT, config = {align = "bm", colour = G.C.CLEAR}, nodes={
+        {n=G.UIT.C, config={align = "bm"}, nodes={
+          {n=G.UIT.R, config={align = "cm", padding = 0.15, r = 2, emboss = 0.1, colour = G.C.L_BLACK}, nodes={
+            -- Row 1: Languages + Play
+            {n=G.UIT.R, config={align = "cm", minw = 4, minh = 0.8, padding = 0.15}, nodes={
+              UIBox_button{id = 'main_menu_play', button = not G.SETTINGS.tutorial_complete and "start_run" or "setup_run", colour = G.C.BLUE, minw = 5.55, minh = 2, emboss = 1, label = {localize('b_play_cap')}, scale = text_scale*3, col = true},
             }},
             -- Row 2: Options + Quit
-            {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-              UIBox_button{button = 'options', colour = G.C.ORANGE, minw = 1.5, minh = 0.8, label = {localize('b_options_cap')}, scale = text_scale, col = true},
-              G.F_QUIT_BUTTON and UIBox_button{button = quit_func, colour = G.C.RED, minw = 1.5, minh = 0.8, label = {localize('b_quit_cap')}, scale = text_scale, col = true} or nil,
+            {n=G.UIT.R, config={align = "cm", padding = 0.25}, nodes={
+              UIBox_button{button = 'options', colour = G.C.ORANGE, minw = 2.55, minh = 1.25, label = {localize('b_options_cap')}, scale = text_scale*1.1, col = true},
+              G.F_QUIT_BUTTON and UIBox_button{button = quit_func, colour = G.C.RED, minw = 2.55, minh = 1.25, label = {localize('b_quit_cap')}, scale = text_scale*1.1, col = true} or nil,
             }},
             -- Row 3: Collection
-            {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-              UIBox_button{id = 'collection_button', button = "your_collection", colour = G.C.PALE_GREEN, minw = 2, minh = 0.8, label = {localize('b_collection_cap')}, scale = text_scale, col = true},
+            {n=G.UIT.R, config={align = "cm", padding = 0.15}, nodes={
+              UIBox_button{id = 'collection_button', button = "your_collection", colour = G.C.PALE_GREEN, minw = 3.65, minh = 1.55, label = {localize('b_collection_cap')}, scale = text_scale*1.5, col = true},
+            }},
+          }},
+        }},
+        {n=G.UIT.C, config={align = "bm"}, nodes={
+          {n=G.UIT.B, config={w = 0.7, h = 0.25}},
+        }},
+        {n=G.UIT.C, config={align = "bm"}, nodes={
+          {n=G.UIT.R, config={align = "cm", padding = 0.15, r = 2, emboss = 0.1, colour = G.C.L_BLACK}, nodes={
+            -- Row 4: Languages
+            {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+              not G.F_ENGLISH_ONLY and {n=G.UIT.C, config={align = "cm", padding = 0.1, minw = 0.8, r = 0.1, hover = true, colour = mix_colours(G.C.WHITE, G.C.GREY, 0.15), button = 'language_selection', shadow = true}, nodes={
+                {n=G.UIT.O, config={object = language}},
+                -- {n=G.UIT.T, config={text = G.LANG.label, scale = 0.4, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+              }} or nil,
             }},
           }},
         }},
       }}
     return t
+  else
+    local t = {
+      n=G.UIT.ROOT, config = {align = "cm",colour = G.C.CLEAR}, nodes={ 
+        {n=G.UIT.C, config={align = "bm"}, nodes={      
+          {n=G.UIT.R, config={align = "cm", padding = 0.2, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK, mid = true}, nodes={
+            UIBox_button{id = 'main_menu_play', button = not G.SETTINGS.tutorial_complete and "start_run" or "setup_run", colour = G.C.BLUE, minw = 3.65, minh = 1.55, label = {localize('b_play_cap')}, scale = text_scale*2, col = true},
+            {n=G.UIT.C, config={align = "cm"}, nodes={
+              UIBox_button{button = 'options', colour = G.C.ORANGE, minw = 2.65, minh = 1.35, label = {localize('b_options_cap')}, scale = text_scale * 1.2, col = true},
+              G.F_QUIT_BUTTON and {n=G.UIT.C, config={align = "cm", minw = 0.2}, nodes={}} or nil,
+              G.F_QUIT_BUTTON and UIBox_button{button = quit_func, colour = G.C.RED, minw = 2.65, minh = 1.35, label = {localize('b_quit_cap')}, scale = text_scale * 1.2, col = true} or nil,
+            }},
+            UIBox_button{id = 'collection_button', button = "your_collection", colour = G.C.PALE_GREEN, minw = 3.65, minh = 1.55, label = {localize('b_collection_cap')}, scale = text_scale*1.5, col = true},
+          }},
+        }},
+        {n=G.UIT.C, config={align = "br", minw = 3.2, padding = 0.1}, nodes={
+          G.F_DISCORD and {n=G.UIT.R, config = {align = "cm", padding = 0.2}, nodes={
+            {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, hover = true, colour = mix_colours(G.C.BLUE, G.C.GREY, 0.4), button = 'go_to_discord', shadow = true}, nodes={
+              {n=G.UIT.O, config={object = discord}},
+            }},
+            {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, hover = true, colour = G.C.BLACK, button = 'go_to_twitter', shadow = true}, nodes={
+              {n=G.UIT.O, config={object = twitter}},
+            }}
+          }} or nil,
+          not G.F_ENGLISH_ONLY and {n=G.UIT.R, config = {align = "cm", padding = 0.2, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK}, nodes={
+            {n=G.UIT.R, config={align = "cm", padding = 0.15, minw = 1, r = 0.1, hover = true, colour = mix_colours(G.C.WHITE, G.C.GREY, 0.2), button = 'language_selection', shadow = true}, nodes={
+              {n=G.UIT.O, config={object = language}},
+              {n=G.UIT.T, config={text = G.LANG.label, scale = 0.4, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+            }}
+          }} or nil,
+        }},
+      }}
+    return t
   end
-
-  return t
 end
 
 function create_UIBox_main_menu_competittion_name()
