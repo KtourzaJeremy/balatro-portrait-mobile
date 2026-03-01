@@ -2165,11 +2165,51 @@ function create_tabs(args)
     tab_buttons[#tab_buttons+1] = UIBox_button({id = 'tab_but_'..(v.label or ''), ref_table = v, button = 'change_tab', label = {v.label}, minh = 0.8*args.scale, minw = 2.5*args.scale, col = true, choice = true, scale = args.text_scale, chosen = v.chosen, func = v.func, focus_args = {type = 'none'}})
   end
 
+  -- Multi-line portrait layout
+  local tabs_container_nodes = tab_buttons
+
+  if G.F_PORTRAIT then
+    local total_tabs = #tab_buttons
+
+    -- 1 to 4 tabs → usual behavior
+    if total_tabs > 4 then
+      
+      local per_row
+      
+      if total_tabs <= 6 then
+        per_row = 3     -- 5 → 3+2 | 6 → 3+3
+      else
+        per_row = 4     -- 7 → 4+3 | 8 → 4+4 | 9+ → 4+x
+      end
+
+      local total_rows = math.ceil(total_tabs / per_row)
+      tabs_container_nodes = {}
+      local index = 1
+
+      for r = 1, total_rows do
+        local row_nodes = {}
+
+        for c = 1, per_row do
+          if tab_buttons[index] then
+            row_nodes[#row_nodes+1] = tab_buttons[index]
+            index = index + 1
+          end
+        end
+
+        tabs_container_nodes[#tabs_container_nodes+1] = {
+          n = G.UIT.R,
+          config = {align = "cm", padding = 0.05},
+          nodes = row_nodes
+        }
+      end
+    end
+  end
+
   local t = 
   {n=G.UIT.R, config={padding = 0.0, align = "cm", colour = G.C.CLEAR}, nodes={
     {n=G.UIT.R, config={align = "cm", colour = G.C.CLEAR}, nodes = {
       (#args.tabs > 1 and not args.no_shoulders) and {n=G.UIT.C, config={minw = 0.7,align = "cm", colour = G.C.CLEAR,func = 'set_button_pip', focus_args = {button = 'leftshoulder', type = 'none', orientation = 'cm', scale = 0.7, offset = {x = -0.1, y = 0}}}, nodes = {}} or nil,
-      {n=G.UIT.C, config={id = args.no_shoulders and 'no_shoulders' or 'tab_shoulders', ref_table = args, align = "cm", padding = 0.15, group = 1, collideable = true, focus_args = #args.tabs > 1 and {type = 'tab', nav = 'wide',snap_to = args.snap_to_nav, no_loop = args.no_loop} or nil}, nodes=tab_buttons},
+      {n=G.UIT.C, config={id = args.no_shoulders and 'no_shoulders' or 'tab_shoulders', ref_table = args, align = "cm", padding = 0.15, group = 1, collideable = true, focus_args = #args.tabs > 1 and {type = 'tab', nav = 'wide',snap_to = args.snap_to_nav, no_loop = args.no_loop} or nil}, nodes=tabs_container_nodes},
       (#args.tabs > 1 and not args.no_shoulders) and {n=G.UIT.C, config={minw = 0.7,align = "cm", colour = G.C.CLEAR,func = 'set_button_pip', focus_args = {button = 'rightshoulder', type = 'none', orientation = 'cm', scale = 0.7, offset = {x = 0.1, y = 0}}}, nodes = {}} or nil,
     }},
     {n=G.UIT.R, config={align = args.tab_alignment, padding = args.padding or 0.1, no_fill = true, minh = args.tab_h, minw = args.tab_w}, nodes={
@@ -2529,22 +2569,27 @@ function create_UIBox_usage(args)
 
   table.sort(used_cards, function (a, b) return a.count > b.count end )
 
+  local scale_histo = 1
+  if G.F_PORTRAIT then
+    scale_histo = 0.7
+  end
+
   local histograms = {}
 
   for i = 1, 10 do
     local v = used_cards[i]
     if v then 
-      local card = Card(0,0, 0.7*G.CARD_W, 0.7*G.CARD_H, nil, G.P_CENTERS[v.key])
+      local card = Card(0,0, 0.7*G.CARD_W*scale_histo, 0.7*G.CARD_H*scale_histo, nil, G.P_CENTERS[v.key])
       card.ambient_tilt = 0.8
       local cardarea = CardArea(
         G.ROOM.T.x + 0.2*G.ROOM.T.w/2,G.ROOM.T.h,
-        G.CARD_W*0.7,
-        G.CARD_H*0.7, 
+        G.CARD_W*0.7*scale_histo,
+        G.CARD_H*0.7*scale_histo, 
         {card_limit = 2, type = 'title', highlight_limit = 0})
       cardarea:emplace(card)
 
       histograms[#histograms +1] = 
-      {n=G.UIT.C, config={align = "bm",minh = 6.2,  colour = G.C.UI.TRANSPARENT_DARK, r = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "bm",minh = 6.2*scale_histo,  colour = G.C.UI.TRANSPARENT_DARK, r = 0.1}, nodes={
         
         {n=G.UIT.R, config={align = "bm"}, nodes={
           {n=G.UIT.R, config={align = "cm", minh = 0.7*G.CARD_H+0.1} , nodes={
@@ -2554,21 +2599,21 @@ function create_UIBox_usage(args)
             {n=G.UIT.T, config={text = v.count, scale = 0.35, colour = mix_colours(G.C.FILTER, G.C.WHITE, 0.8), shadow = true}}
           }},
           {n=G.UIT.R, config={align = "cm"}, nodes={
-            {n=G.UIT.R, config={align = "cm", minh = v.count/max_amt*3.6, minw = 0.8, colour = G.C.SECONDARY_SET[G.P_CENTERS[v.key].set] or G.C.RED, res = 0.15, r = 0.001}, nodes={}},
+            {n=G.UIT.R, config={align = "cm", minh = (v.count/max_amt*3.6)*scale_histo, minw = 0.8*scale_histo, colour = G.C.SECONDARY_SET[G.P_CENTERS[v.key].set] or G.C.RED, res = 0.15, r = 0.001}, nodes={}},
           }},
         }},
       }}
     else
       histograms[#histograms +1] = 
-      {n=G.UIT.C, config={align = "bm",minh = 6.2,  colour = G.C.UI.TRANSPARENT_DARK, r = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "bm",minh = 6.2*scale_histo,  colour = G.C.UI.TRANSPARENT_DARK, r = 0.1}, nodes={
         {n=G.UIT.R, config={align = "bm"}, nodes={
-          {n=G.UIT.R, config={align = "cm", minh = 0.7*G.CARD_H+0.1, minw = 0.7*G.CARD_W} , nodes={
+          {n=G.UIT.R, config={align = "cm", minh = 0.7*G.CARD_H*scale_histo+0.1, minw = 0.7*G.CARD_W*scale_histo} , nodes={
           }},
           {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
             {n=G.UIT.T, config={text = '-', scale = 0.35, colour = mix_colours(G.C.FILTER, G.C.WHITE, 0.8), shadow = true}}
           }},
           {n=G.UIT.R, config={align = "cm"}, nodes={
-            {n=G.UIT.R, config={align = "cm", minh = 0.2, minw = 0.8, colour = G.C.UI.TRANSPARENT_LIGHT, res = 0.15, r = 0.001}, nodes={}},
+            {n=G.UIT.R, config={align = "cm", minh = 0.2*scale_histo, minw = 0.8*scale_histo, colour = G.C.UI.TRANSPARENT_LIGHT, res = 0.15, r = 0.001}, nodes={}},
           }},
         }},
       }}
@@ -2683,14 +2728,20 @@ function create_UIBox_high_scores()
   }
   G.focused_profile = G.SETTINGS.profile
   local cheevs = {}
+
+  if G.F_PORTRAIT then
+    display = G.UIT.R
+  else
+    display = G.UIT.C
+  end
   
   local t = create_UIBox_generic_options({ back_func = 'options', snap_back = true, contents = {
-    {n=G.UIT.C, config={align = "cm", minw = 3, padding = 0.2, r = 0.1, colour = G.C.CLEAR}, nodes={
+    {n=display, config={align = "cm", minw = 3, padding = 0.2, r = 0.1, colour = G.C.CLEAR}, nodes={
       {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes=
         scores
       },
     }},
-    {n=G.UIT.C, config={align = "cm", padding = 0.1, r = 0.1, colour = G.C.CLEAR}, nodes={
+    {n=display, config={align = "cm", padding = 0.1, r = 0.1, colour = G.C.CLEAR}, nodes={
       create_progress_box(),
       UIBox_button({button = 'usage', label = {localize('k_card_stats')}, minw = 7.5, minh =1, focus_args = {nav = 'wide'}}),
     }},
@@ -3806,14 +3857,16 @@ end
 
 function create_UIBox_your_collection_tarots()
   local deck_tables = {}
-
   G.your_collection = {}
-  for j = 1, 2 do
+
+  local row_sizes = G.F_PORTRAIT and {3, 4, 4} or {5, 6}
+  
+  for j = 1, #row_sizes do
     G.your_collection[j] = CardArea(
       G.ROOM.T.x + 0.2*G.ROOM.T.w/2,G.ROOM.T.h,
-      (4.25+j)*G.CARD_W,
+      (row_sizes[j] + 0.25)*G.CARD_W,
       1*G.CARD_H, 
-      {card_limit = 4 + j, type = 'title', highlight_limit = 0, collection = true})
+      {card_limit = row_sizes[j], type = 'title', highlight_limit = 0, collection = true})
     table.insert(deck_tables, 
     {n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true}, nodes={
       {n=G.UIT.O, config={object = G.your_collection[j]}}
@@ -3826,12 +3879,19 @@ function create_UIBox_your_collection_tarots()
     table.insert(tarot_options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.floor(#G.P_CENTER_POOLS.Tarot/11)))
   end
 
-    for j = 1, #G.your_collection do
-      for i = 1, 4+j do
-      local center = G.P_CENTER_POOLS["Tarot"][i+(j-1)*(5)]
-      local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, nil, center)
-      card:start_materialize(nil, i>1 or j>1)
-      G.your_collection[j]:emplace(card)
+  local card_index = 1
+
+  for j = 1, #G.your_collection do
+    for i = 1, row_sizes[j] do
+      local center = G.P_CENTER_POOLS["Tarot"][card_index]
+      
+      if center then 
+        local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, nil, center)
+        card:start_materialize(nil, i>1 or j>1)
+        G.your_collection[j]:emplace(card)
+      end
+      
+      card_index = card_index + 1
     end
   end
 
@@ -3891,13 +3951,21 @@ end
 function create_UIBox_your_collection_planets()
   local deck_tables = {}
 
+  local nb_rows = 2
+  local nb_cols = 6
+
+  if G.F_PORTRAIT then
+    nb_rows = 3
+    nb_cols = 4
+  end
+
   G.your_collection = {}
-  for j = 1, 2 do
+  for j = 1, nb_rows do
     G.your_collection[j] = CardArea(
       G.ROOM.T.x + 0.2*G.ROOM.T.w/2,G.ROOM.T.h,
-      (6.25)*G.CARD_W,
+      (nb_cols+0.25)*G.CARD_W,
       1*G.CARD_H, 
-      {card_limit = 6, type = 'title', highlight_limit = 0, collection = true})
+      {card_limit = nb_cols, type = 'title', highlight_limit = 0, collection = true})
     table.insert(deck_tables, 
     {n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true}, nodes={
       {n=G.UIT.O, config={object = G.your_collection[j]}}
@@ -3906,8 +3974,8 @@ function create_UIBox_your_collection_planets()
   end
 
     for j = 1, #G.your_collection do
-      for i = 1, 6 do
-      local center = G.P_CENTER_POOLS["Planet"][i+(j-1)*(6)]
+      for i = 1, nb_cols do
+      local center = G.P_CENTER_POOLS["Planet"][i+(j-1)*(nb_cols)]
       local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, nil, center)
       card:start_materialize(nil, i>1 or j>1)
       G.your_collection[j]:emplace(card)
@@ -5731,6 +5799,11 @@ end
 
 function G.UIDEF.challenge_list(from_game_over)
   G.CHALLENGE_PAGE_SIZE = 10
+
+  if G.F_PORTRAIT then
+    G.CHALLENGE_PAGE_SIZE = 5
+  end
+
   local challenge_pages = {}
   for i = 1, math.ceil(#G.CHALLENGES/G.CHALLENGE_PAGE_SIZE) do
     table.insert(challenge_pages, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#G.CHALLENGES/G.CHALLENGE_PAGE_SIZE)))
@@ -5745,25 +5818,45 @@ function G.UIDEF.challenge_list(from_game_over)
       _ch_comp = _ch_comp + 1
     end
   end
+  if G.F_PORTRAIT then
+    local t = create_UIBox_generic_options({ back_id = from_game_over and 'from_game_over' or nil, back_func = 'setup_run', back_id = 'challenge_list', contents = {
+      {n=G.UIT.R, config={align = "cm", minh = 9, minw = 11.5}, nodes={
+        {n=G.UIT.O, config={id = 'challenge_area', object = Moveable()}},
+      }},
+      {n=G.UIT.R, config={align = "cm", padding = 0.0}, nodes={
+        {n=G.UIT.R, config={align = "cm", padding = 0.1, minh = 3.5, minw = 4.2}, nodes={
+          {n=G.UIT.O, config={id = 'challenge_list', object = Moveable()}},
+        }},
+        {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+          create_option_cycle({id = 'challenge_page',scale = 0.9, h = 0.3, w = 3.5, options = challenge_pages, cycle_shoulders = true, opt_callback = 'change_challenge_list_page', current_option = 1, colour = G.C.RED, no_pips = true, focus_args = {snap_to = true}})
+        }},
+        {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+          {n=G.UIT.T, config={text = localize{type = 'variable', key = 'challenges_completed', vars = {_ch_comp, _ch_tot}}, scale = 0.4, colour = G.C.WHITE}},
+        }},
 
-  local t = create_UIBox_generic_options({ back_id = from_game_over and 'from_game_over' or nil, back_func = 'setup_run', back_id = 'challenge_list', contents = {
-    {n=G.UIT.C, config={align = "cm", padding = 0.0}, nodes={
-      {n=G.UIT.R, config={align = "cm", padding = 0.1, minh = 7, minw = 4.2}, nodes={
-        {n=G.UIT.O, config={id = 'challenge_list', object = Moveable()}},
       }},
-      {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
-        create_option_cycle({id = 'challenge_page',scale = 0.9, h = 0.3, w = 3.5, options = challenge_pages, cycle_shoulders = true, opt_callback = 'change_challenge_list_page', current_option = 1, colour = G.C.RED, no_pips = true, focus_args = {snap_to = true}})
-      }},
-      {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
-        {n=G.UIT.T, config={text = localize{type = 'variable', key = 'challenges_completed', vars = {_ch_comp, _ch_tot}}, scale = 0.4, colour = G.C.WHITE}},
-      }},
+    }})
+    return t
+  else
+    local t = create_UIBox_generic_options({ back_id = from_game_over and 'from_game_over' or nil, back_func = 'setup_run', back_id = 'challenge_list', contents = {
+      {n=G.UIT.C, config={align = "cm", padding = 0.0}, nodes={
+        {n=G.UIT.R, config={align = "cm", padding = 0.1, minh = 7, minw = 4.2}, nodes={
+          {n=G.UIT.O, config={id = 'challenge_list', object = Moveable()}},
+        }},
+        {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+          create_option_cycle({id = 'challenge_page',scale = 0.9, h = 0.3, w = 3.5, options = challenge_pages, cycle_shoulders = true, opt_callback = 'change_challenge_list_page', current_option = 1, colour = G.C.RED, no_pips = true, focus_args = {snap_to = true}})
+        }},
+        {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+          {n=G.UIT.T, config={text = localize{type = 'variable', key = 'challenges_completed', vars = {_ch_comp, _ch_tot}}, scale = 0.4, colour = G.C.WHITE}},
+        }},
 
-    }},
-    {n=G.UIT.C, config={align = "cm", minh = 9, minw = 11.5}, nodes={
-      {n=G.UIT.O, config={id = 'challenge_area', object = Moveable()}},
-    }},
-  }})
-  return t
+      }},
+      {n=G.UIT.C, config={align = "cm", minh = 9, minw = 11.5}, nodes={
+        {n=G.UIT.O, config={id = 'challenge_area', object = Moveable()}},
+      }},
+    }})
+    return t
+  end
 end
 
 function G.UIDEF.challenge_list_page(_page)
