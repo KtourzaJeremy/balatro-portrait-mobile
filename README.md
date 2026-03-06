@@ -2,7 +2,7 @@
 
 🎴 A portrait mode mod for Balatro on Android - optimized for mobile gaming!
 
-<img width="587" height="1290" alt="image" src="https://github.com/user-attachments/assets/1e509b4e-fe9d-4619-9b68-e223310f34d2" />
+<img width="587" height="1290" alt="image" src="https://github.com/user-attachments/assets/1d12d7e3-aa3b-4c34-ad18-14e0c554cfb2" />
 
 ## Features
 
@@ -112,6 +112,37 @@ python rebuild_game.py
 When asked "Apply CRT disable patch?", answer **yes**.
 
 ## Changelog
+
+### v1.5.0
+
+#### UI & Accessibility Overhaul
+
+    New Vertical HUD: Stats and action buttons are now anchored at the top of the screen for constant visibility without scrolling.
+
+    Optimized Layout: Deck and consumables now share a horizontal line. Tags are permanently visible next to Jokers with tooltips adjusted to prevent clipping.
+
+    Upgraded Controls: Play/Discard buttons are larger for touch screens and strictly uniform in size.
+
+    One-Handed Mode: Added a Left/Right-handed setting that shifts tags, consumables, and the deck for better ergonomics.
+
+    Customizable HUD: Players can now change the order and alignment (left/center/right) of the Run Info and Options buttons.
+
+#### Portrait Mode Screen Adaptations
+
+    Menus & Overlays: Fully adapted the Card Inventory, Main Menu (scaling title, larger buttons, global version display), Win, and Game Over screens.
+
+    Stats & Challenges: Restructured into readable single-column vertical layouts.
+
+    Collections: Tarot and Planet cards are now cleanly formatted into 3 rows.
+
+#### Bug Fixes
+
+    Blind Selection: Fixed a major logic bug in Portrait mode where future blinds were accessible early and skipped blinds could be endlessly replayed. The active blind is now properly locked and visually highlighted.
+
+#### System & Compatibility
+
+    Added MacOS cross-platform support.
+    Removed the 7-zip requirement.
 
 ### v1.4.0
 
