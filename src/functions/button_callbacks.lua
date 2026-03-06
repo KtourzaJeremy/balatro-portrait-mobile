@@ -630,19 +630,25 @@ G.FUNCS.your_collection_tarot_page = function(args)
     for i = #G.your_collection[j].cards,1, -1 do
       local c = G.your_collection[j]:remove_card(G.your_collection[j].cards[i])
       c:remove()
-      c = nil
+    end
+  end
+
+  local row_sizes = G.F_PORTRAIT and {3, 4, 4} or {5, 6}
+  local page = args.cycle_config.current_option
+  local card_index = 1 + (page - 1) * 11
+
+  for j = 1, #G.your_collection do
+    for i = 1, row_sizes[j] do
+      local center = G.P_CENTER_POOLS["Tarot"][card_index]
+      if center then 
+        local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, nil, center)
+        card:start_materialize(nil, i>1 or j>1)
+        G.your_collection[j]:emplace(card)
+      end
+      card_index = card_index + 1
     end
   end
   
-  for j = 1, #G.your_collection do
-    for i = 1, 4+j do
-      local center = G.P_CENTER_POOLS["Tarot"][i+(j-1)*(5) + (11*(args.cycle_config.current_option - 1))]
-      if not center then break end
-      local card = Card(G.your_collection[j].T.x + G.your_collection[j].T.w/2, G.your_collection[j].T.y, G.CARD_W, G.CARD_H, G.P_CARDS.empty, center)
-      card:start_materialize(nil, i>1 or j>1)
-      G.your_collection[j]:emplace(card)
-    end
-  end
   INIT_COLLECTION_CARD_ALERTS()
 end
 
@@ -831,6 +837,85 @@ G.FUNCS.change_play_discard_position = function(args)
           definition = create_UIBox_buttons(),
           config = {align="bm", offset = {x=0,y=0.3},major = G.hand, bond = 'Weak'}
       }
+  end
+end
+
+--Updates play areas position (Left/Right Hand mode)
+--
+---@param args {cycle_config: table, to_key: value}
+--**cycle_config** Is the config table from the original option cycle UIE
+--**to_key** The new screenmode setting key
+G.FUNCS.change_play_main_hand = function(args)
+  G.SETTINGS.play_main_hand = args.to_key
+  
+  -- 1. Updates card areas physical coordinates
+  set_screen_positions()
+
+  -- 2. Update the LIVE alignment properties of the first tag
+  if G.HUD_tags and G.HUD_tags[1] and G.F_PORTRAIT then
+    -- Modify the actual active alignment type ('bl' or 'br')
+    G.HUD_tags[1].alignment.type = (G.SETTINGS.play_main_hand == 1) and 'bl' or 'br'
+    G.HUD_tags[1].alignment.offset.x = (G.SETTINGS.play_main_hand == 1) and -0.2  or 0.2
+  end
+
+  -- 3. Recalculate specific UI elements safely
+  if G.STAGE == G.STAGES.RUN then
+    if G.HUD then G.HUD:recalculate() end
+    if G.buttons then G.buttons:recalculate() end
+    
+    -- Target ONLY Deck and Consumables UI boxes to prevent ghost menus
+    for _, uibox in pairs(G.I.UIBOX or {}) do
+      if uibox.config and (uibox.config.major == G.deck or uibox.config.major == G.consumeables) then
+        uibox:recalculate()
+      end
+    end
+    
+    -- Force tags to update their visual coordinates immediately
+    if G.HUD_tags then
+      for i = 1, #G.HUD_tags do
+        G.HUD_tags[i]:recalculate()
+      end
+    end
+  end
+end
+
+--Changes the position and order of Run Info / Options buttons
+--
+---@param args {cycle_config: table, to_key: value}
+--**cycle_config** Is the config table from the original option cycle UIE
+--**to_key** The new position key
+G.FUNCS.change_runinfo_options_position = function(args)
+  G.SETTINGS.runinfo_options_button_pos = args.to_key
+  local pos = args.to_key
+
+  -- 1. Only proceed if the main HUD exists (i.e. we are in a run)
+  if G.HUD then
+    local button_area = G.HUD:get_UIE_by_ID('button_area')
+    local run_info = G.HUD:get_UIE_by_ID('run_info_container')
+    local options = G.HUD:get_UIE_by_ID('options_container')
+
+    if button_area and run_info and options then
+      
+      -- 2. Update the horizontal alignment of the entire button area
+      local new_align = "bm"
+      if pos >= 3 and pos <= 4 then new_align = "bl" end
+      if pos >= 5 then new_align = "br" end
+      button_area.config.align = new_align
+
+      -- 3. Reorder the children nodes based on the setting (Odd = Run Info first, Even = Options first)
+      if pos % 2 == 0 then
+        -- Options first
+        button_area.children[1] = options
+        button_area.children[2] = run_info
+      else
+        -- Run Info first
+        button_area.children[1] = run_info
+        button_area.children[2] = options
+      end
+
+      -- 4. Tell the main HUD to update the layout of its newly ordered children
+      G.HUD:recalculate()
+    end
   end
 end
 
@@ -2629,10 +2714,13 @@ end
   end
 
   G.FUNCS.blind_choice_handler = function(e)
-    if not e.config.ref_table.run_info and G.blind_select and G.blind_select.VT.y < 10 and e.config.id and G.blind_select_opts[string.lower(e.config.id)] then 
+    -- Dynamic Y-limit to account for Portrait mode's lower UI placement
+    local y_limit = G.F_PORTRAIT and 50 or 10
+
+    if not e.config.ref_table.run_info and G.blind_select and G.blind_select.VT.y < y_limit and e.config.id and G.blind_select_opts[string.lower(e.config.id)] then 
       if e.UIBox.role.xy_bond ~= 'Weak' then e.UIBox:set_role({xy_bond = 'Weak'}) end
       if (e.config.ref_table.deck ~= 'on' and e.config.id == G.GAME.blind_on_deck) or
-         (e.config.ref_table.deck ~= 'off' and e.config.id ~= G.GAME.blind_on_deck) then
+        (e.config.ref_table.deck ~= 'off' and e.config.id ~= G.GAME.blind_on_deck) then
 
           local _blind_choice = G.blind_select_opts[string.lower(e.config.id)]
           local _top_button = e.UIBox:get_UIE_by_ID('select_blind_button')
@@ -2649,7 +2737,11 @@ end
             _border.parent.config.outline_colour = G.C.UI.TRANSPARENT_DARK
             _border.config.outline_colour = _border.config.outline and _border.config.outline_colour or get_blind_main_colour(e.config.id)
             _border.config.outline = 1.5
-            _blind_choice.alignment.offset.y = -0.9
+            
+            -- Elevates the active blind visually
+            local y_offset_active = G.F_PORTRAIT and 0 or -0.9
+            _blind_choice.alignment.offset.y = y_offset_active
+            
             if _tag and _tag_container then 
               _tag_container.children[2].config.draw_after = false
               _tag_container.children[2].config.colour = G.C.BLACK
@@ -2678,10 +2770,14 @@ end
             _border.parent.config.outline_colour = nil
             _border.config.outline_colour = nil
             _border.config.outline = nil
-            _blind_choice.alignment.offset.y = -0.2
+            
+            -- Pushes inactive blinds down visually
+            local y_offset_inactive = G.F_PORTRAIT and 1.2 or -0.2
+            _blind_choice.alignment.offset.y = y_offset_inactive
+            
             if _tag and _tag_container then 
               if G.GAME.round_resets.blind_states[e.config.id] == 'Skipped' or
-                 G.GAME.round_resets.blind_states[e.config.id] == 'Defeated' then
+                G.GAME.round_resets.blind_states[e.config.id] == 'Defeated' then
                 _tag_container.children[2]:set_role({xy_bond = 'Weak'})
                 _tag_container.children[2]:align(0, 10)
                 _tag_container.children[1]:set_role({xy_bond = 'Weak'})
